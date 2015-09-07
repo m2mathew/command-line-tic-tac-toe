@@ -1,0 +1,23 @@
+{
+  "name": "command-line-tic-tac-toe",
+  "version": "1.0.0",
+  "description": "A fun CLI game",
+  "main": "main.js",
+  "dependencies": {
+    "prompt-sync": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m2mathew/command-line-tic-tac-toe.git"
+  },
+  "author": "Mike Mathew",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/m2mathew/command-line-tic-tac-toe/issues"
+  },
+  "homepage": "https://github.com/m2mathew/command-line-tic-tac-toe#readme"
+}
