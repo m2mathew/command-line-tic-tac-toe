@@ -8,6 +8,8 @@ var prompt = require("prompt-sync").prompt;
 // Initializing variables
 var player1 = null;
 var player2 = null;
+var giveUp = false;
+var bigCounter = 1;
 var counter = 0;
 var currentPlayer = null;
 var currentMove = null;
@@ -17,6 +19,8 @@ var noWinner = false;
 var rowWinner = false;
 var colWinner = false;
 var diagWinner = false;
+var repeatPlay = false;
+var playAgain = null;
 
 // Game board stored as nested arrays
 var gameBoard = [
@@ -48,6 +52,15 @@ var blankBoard = function() {
 var askMove = function() {
     console.log("Enter your move in the format: # #");
     currentMove = prompt();
+    if (currentMove === "forfeit") {
+        giveUp = true;
+        console.log("Game ended.");
+
+        if (currentPlayer === player1)
+            console.log("Player 2 WINS! NOICE!");
+        else
+            console.log("Player 1 WINS! YEAH!");
+    }
 };
 
 // function to check for valid input
@@ -135,6 +148,48 @@ var congrats = function() {
         }
 };
 
+var anotherGame = function() {
+    if (winner !== false || noWinner !== false) {
+        console.log("Would like to play again? [y or n]");
+        playAgain = prompt().toLowerCase();
+    }
+    if (playAgain === "n" || playAgain === "no") {
+        console.log("");
+        console.log("Welp, it was fun while it lasted.");
+        repeatPlay = false;
+    }
+    else if (playAgain === "y" || playAgain === "yes") {
+        console.log("");
+        console.log("Excellent. Round " + bigCounter + " coming up!");
+        repeatPlay = true;
+    }
+    else {
+        console.log("");
+        console.log("Buh-bye!");
+        repeatPlay = false;
+    }
+};
+
+var resetGame = function() {
+    counter = 0;
+    currentMove = null;
+    goodMove = false;
+    giveUp = false;
+    winner = false;
+    noWinner = false;
+    rowWinner = false;
+    colWinner = false;
+    diagWinner = false;
+    playAgain = null;
+    currentMove = [];
+    move = [];
+    gameBoard = [
+        [" ", " ", " "],
+        [" ", " ", " "],
+        [" ", " ", " "]
+    ];
+};
+
 // Prepare the players for this experience
 console.log("");
 console.log("Get ready for some \"Noughts and Crosses\" \n\(sometimes called Tic-Tac-Toe\)");
@@ -164,60 +219,81 @@ console.log("");
 console.log("Tell me your desired position by column then row.");
 console.log("For example, entering \"1 2\" will make your mark in the 1st column & 2nd row.");
 console.log("");
-
-blankBoard();
-
-// Play begins
-currentPlayer = player1;
-console.log(player1 + ", you go first");
+console.log("Any player can type the word forfeit to stop game.");
+console.log("");
 
 // Repeat this until a player wins
+bigBody:
 do {
-    counter++;
+    bigCounter++;
 
-    // loop to check validity of input data
-    while (goodMove !== true) {
-        askMove();
-        validMove();
-    }
+    body:
+    do {
+        counter++;
 
-    // Store the player 1 move in an array
-    var space = " ";
-    var move = currentMove.split(space);
+        if (counter === 1) {
+            blankBoard();
+            // Play begins
+            currentPlayer = player1;
+            console.log(player1 + ", you go first");
+        }
 
-    // Change values of array to integer
-    move[0] = parseInt(move[0],10);
-    move[1] = parseInt(move[1],10);
+        // loop to check validity of input data
+        while (goodMove !== true && giveUp !== true) {
+            askMove();
+            if (giveUp === true)
+                break body;
+            validMove();
+        }
+
+        // Store the player 1 move in an array
+        var space = " ";
+        var move = currentMove.split(space);
+
+        // Change values of array to integer
+        move[0] = parseInt(move[0],10);
+        move[1] = parseInt(move[1],10);
 
 
-    // Store the current player's move in the gameBoard
-    if (currentPlayer === player1) {
-        gameBoard[move[1]-1][move[0]-1] = "X";
+        // Store the current player's move in the gameBoard
+        if (currentPlayer === player1) {
+            gameBoard[move[1]-1][move[0]-1] = "X";
+        }
+        else {
+            gameBoard[move[1]-1][move[0]-1] = "O";
+        }
+
+        // print game board each turn
+        printBoard();
+
+        // Search for possible winner
+        checkWinner();
+
+        // Congratulations and such
+        congrats();
+
+        // switch players at end of turn or end game if board is full
+        if (currentPlayer === player1 && winner !== true) {
+            console.log(player2 + "\'s turn");
+            currentPlayer = player2;
+            goodMove = false;
+        } else if (winner !== true) {
+            console.log(player1 + "\'s turn");
+            currentPlayer = player1;
+            goodMove = false;
+        }
+
+
+    } while (winner !== true && noWinner !== true && giveUp !== true); // end of while loop that runs until winner equals true
+
+    anotherGame();
+
+    if (repeatPlay === true) {
+        resetGame();
     }
     else {
-        gameBoard[move[1]-1][move[0]-1] = "O";
+        break bigBody;
     }
-
-    // print game board each turn
-    printBoard();
-
-    // Search for possible winner
-    checkWinner();
-
-    // Congratulations and such
-    congrats();
-
-    // switch players at end of turn or end game if board is full
-    if (currentPlayer === player1 && winner !== true) {
-        console.log(player2 + "\'s turn");
-        currentPlayer = player2;
-        goodMove = false;
-    } else if (winner !== true) {
-        console.log(player1 + "\'s turn");
-        currentPlayer = player1;
-        goodMove = false;
-    }
-
-} while (winner !== true && noWinner !== true ); // end of while loop that runs until winner equals true
+} while (repeatPlay === true);
 
 console.log("Thanks for playing!");
