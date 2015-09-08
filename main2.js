@@ -1,14 +1,15 @@
 // Command Line Tic-Tac-Toe
-// Hard Mode - a 2-player game for funsies
-// with ability to forfeit the game or optionally play again
+// Normal Mode - a 2-player game for funsies
 
 
 // code to bring in the function of prompt
 var prompt = require("prompt-sync").prompt;
 
 // Initializing variables
+var typeGame = null;
 var player1 = null;
 var player2 = null;
+var cpu = false;
 var giveUp = false;
 var bigCounter = 1;
 var counter = 0;
@@ -195,6 +196,16 @@ var resetGame = function() {
 console.log("");
 console.log("Get ready for some \"Noughts and Crosses\" \n\(sometimes called Tic-Tac-Toe\)");
 console.log("");
+console.log("Do you want a [1]human opponent or [2]computer opponent? [1 or 2]");
+var typeGame = prompt();
+
+if (typeGame === 2) {
+    cpu = true;
+    console.log("Player 1 is the computer");
+    var player1 = "COMPUTER";
+    console.log("Player 2: What is your name?");
+    var player2 = prompt();
+}
 
 do {
     console.log("Player 1: What is your name?");
@@ -206,7 +217,7 @@ do {
     if (player1 === player2)
         console.log("Please enter different names");
 
-} while (player1 === player2);
+} while (player1 === player2 && cpu !== true);
 
 console.log("- - - - - - - - - - - - - - - - - - - - - - -");
 console.log("");
@@ -228,64 +239,125 @@ bigBody:
 do {
     bigCounter++;
 
-    body:
-    do {
-        counter++;
+    if (cpu === true) {
 
-        if (counter === 1) {
-            blankBoard();
-            // Play begins
-            currentPlayer = player1;
-            console.log(player1 + ", you go first");
-        }
+        computerLoop:
+        do {
 
-        // loop to check validity of input data
-        while (goodMove !== true && giveUp !== true) {
-            askMove();
-            if (giveUp === true)
-                break body;
-            validMove();
-        }
+            counter++;
 
-        // Store the player 1 move in an array
-        var space = " ";
-        var move = currentMove.split(space);
+            if (counter === 1) {
+                blankBoard();
+                // Play begins
+                currentPlayer = player1;
+                console.log(player1 + ", you go first");
+            }
 
-        // Change values of array to integer
-        move[0] = parseInt(move[0],10);
-        move[1] = parseInt(move[1],10);
+            // loop to check validity of input data
+            while (currentPlayer = player2 && goodMove !== true && giveUp !== true) {
+                askMove();
+                if (giveUp === true)
+                    break computerLoop;
+                validMove();
+            }
+
+            // Store the player 1 move in an array
+            var space = " ";
+            var move = currentMove.split(space);
+
+            // Change values of array to integer
+            move[0] = parseInt(move[0],10);
+            move[1] = parseInt(move[1],10);
+
+            // Store the current player's move in the gameBoard
+            if (currentPlayer === player1) {
+                gameBoard[move[1]-1][move[0]-1] = "X";
+            }
+            else {
+                gameBoard[move[1]-1][move[0]-1] = "O";
+            }
+
+            // print game board each turn
+            printBoard();
+
+            // Search for possible winner
+            checkWinner();
+
+            // Congratulations and such
+            congrats();
+
+            // switch players at end of turn or end game if board is full
+            if (currentPlayer === player1 && winner !== true) {
+                console.log(player2 + "\'s turn");
+                currentPlayer = player2;
+                goodMove = false;
+            } else if (winner !== true) {
+                console.log(player1 + "\'s turn");
+                currentPlayer = player1;
+                goodMove = false;
+            }
 
 
-        // Store the current player's move in the gameBoard
-        if (currentPlayer === player1) {
-            gameBoard[move[1]-1][move[0]-1] = "X";
-        }
-        else {
-            gameBoard[move[1]-1][move[0]-1] = "O";
-        }
+        } while (winner !== true && noWinner !== true && giveUp !== true);
+    }
+    else {
 
-        // print game board each turn
-        printBoard();
+        humanLoop:
+        do {
+            counter++;
 
-        // Search for possible winner
-        checkWinner();
+            if (counter === 1) {
+                blankBoard();
+                // Play begins
+                currentPlayer = player1;
+                console.log(player1 + ", you go first");
+            }
 
-        // Congratulations and such
-        congrats();
+            // loop to check validity of input data
+            while (goodMove !== true && giveUp !== true) {
+                askMove();
+                if (giveUp === true)
+                    break humanLoop;
+                validMove();
+            }
 
-        // switch players at end of turn or end game if board is full
-        if (currentPlayer === player1 && winner !== true) {
-            console.log(player2 + "\'s turn");
-            currentPlayer = player2;
-            goodMove = false;
-        } else if (winner !== true) {
-            console.log(player1 + "\'s turn");
-            currentPlayer = player1;
-            goodMove = false;
-        }
+            // Store the player 1 move in an array
+            var space = " ";
+            var move = currentMove.split(space);
 
+            // Change values of array to integer
+            move[0] = parseInt(move[0],10);
+            move[1] = parseInt(move[1],10);
 
-    } while (winner !== true && noWinner !== true && giveUp !== true); // end of while loop that runs until winner equals true
+            // Store the current player's move in the gameBoard
+            if (currentPlayer === player1) {
+                gameBoard[move[1]-1][move[0]-1] = "X";
+            }
+            else {
+                gameBoard[move[1]-1][move[0]-1] = "O";
+            }
+
+            // print game board each turn
+            printBoard();
+
+            // Search for possible winner
+            checkWinner();
+
+            // Congratulations and such
+            congrats();
+
+            // switch players at end of turn or end game if board is full
+            if (currentPlayer === player1 && winner !== true) {
+                console.log(player2 + "\'s turn");
+                currentPlayer = player2;
+                goodMove = false;
+            } else if (winner !== true) {
+                console.log(player1 + "\'s turn");
+                currentPlayer = player1;
+                goodMove = false;
+            }
+
+        } while (winner !== true && noWinner !== true && giveUp !== true); // end of while loop that runs until winner equals true
 
     anotherGame();
 
